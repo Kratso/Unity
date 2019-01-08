@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
+    public Vector3 initialPosition;
     public float speed = 10f;
 
     // Use this for initialization
     void Start()
     {
-
+        initialPosition = transform.position;
     }
 
     // Update is called once per frame
@@ -19,13 +20,13 @@ public class PlayerControl : MonoBehaviour
         {
             float y_ax = speed * Input.GetAxisRaw("Vertical") * Time.deltaTime;
             Vector3 mov = new Vector3(0, y_ax, 0);
-            if ((transform.position.y < 3.85 && y_ax > 0) || (transform.position.y>-1.96 && y_ax < 0))
+            if ((transform.position.y < 3.85 && y_ax > 0) || (transform.position.y>-2.00 && y_ax < 0))
                 transform.position += mov;
         }
     }
 
-    private void Reset()
+    public void Reset()
     {
-        transform.position.Set(transform.position.x,0.66f,transform.position.z);
+        transform.position = initialPosition;
     }
 }
