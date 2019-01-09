@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class BallMovement : MonoBehaviour {
 
     public float startingSpd = 400f;
@@ -12,17 +13,19 @@ public class BallMovement : MonoBehaviour {
 
     bool inGame = false;
 
+    public LP lp;
+
     Vector3 startingPos;
 
 	// Use this for initialization
 	void Start () {
-        
+
+        startingPos = transform.position;
 
 
+    }
 	
-	}
-	
-	void Reset()
+	public void Reset()
     {
         inGame = false;
         transform.SetParent(player);
@@ -32,21 +35,38 @@ public class BallMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!inGame)
+        if (lp.IsAlive())
         {
+            if (!inGame)
+        {
+            rig.velocity = Vector3.zero;
             if (Input.GetKeyDown(KeyCode.LeftControl))
             {
                 inGame = true;
                 transform.SetParent(null);
-                rig.AddForce(new Vector3(startingSpd, startingSpd, 0));
-                startingPos = transform.position;
+                rig.AddForce(new Vector3(-startingSpd, -startingSpd, 0));
+                transform.position = startingPos;
             }
-        }
-		if(Input.GetKeyDown(KeyCode.R)
-		{
-			Reset();
-		}
-	}
+        } 
+        else
+        {
+                float rng = Random.value * 10;
 
-    
+                rng -= 5;
+
+                float rng2 = Random.value;
+
+                if (rng2 < 0.1f)
+                {
+                    rig.AddForce(rng, rng, 0);
+                }
+            }
+        if (Input.GetKeyDown(KeyCode.R)){
+            Reset();
+        }
+
+        }
+    }
+
+
 }
