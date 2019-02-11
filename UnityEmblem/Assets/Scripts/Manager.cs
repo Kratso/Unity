@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Manager : MonoBehaviour
 {
 
+	public float levelStartDelay = 2f;
 	public float turnDelay = .1f;
 	public BoardManager boardScript;
 
@@ -12,12 +15,16 @@ public class Manager : MonoBehaviour
 
 	public bool playerTurn = true;
 
+	private Text levelText;                                 //Text to display current level number.
+	private GameObject levelImage;
 	public static Manager instance = null;
 
 	private int level = 1;
 
 	private List<EnemyMovement> enemies;
 	private bool enemiesMoving;
+
+	private bool doingSetup = true;
 
 	void Awake()
 	{
@@ -40,19 +47,43 @@ public class Manager : MonoBehaviour
 
 	void InitGame()
 	{
+		doingSetup = true;
+
+		levelImage = GameObject.Find("Level Image");
+		levelText = GameObject.Find("Level Text").GetComponent<Text>();
+
+		levelText.text = "Day: " + level;
+
+		levelImage.SetActive(true);
+
+		Invoke("HideLevelImage", levelStartDelay);
+
 		enemies.Clear();
 		boardScript.SetupScene(level);
+	}
+
+	void HideLevelImage()
+	{
+		levelImage.SetActive(false);
+		doingSetup = false;
 	}
 
 	void OnLevelWasLoaded(int index)
 	{
 		level++;
+
 		InitGame();
 	}
 
 	public void GameOver()
 	{
+		levelText.text = "You perished after " + level + "days\nYou won't be remembered.";
+		levelImage.SetActive(true);
 		enabled = false;
+		if (Input.GetKeyDown(KeyCode.Return))
+		{
+			SceneManager.LoadScene("Menu");
+		}
 	}
 
 

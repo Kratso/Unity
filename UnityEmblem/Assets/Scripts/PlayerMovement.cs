@@ -2,10 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 public class PlayerMovement : Movement
 {
+
+	public AudioClip moveSound1;
+	public AudioClip moveSound2;
+	public AudioClip eatSound1;
+	public AudioClip eatSound2;
+	public AudioClip drinkSound1;
+	public AudioClip drinkSound2;
+	public AudioClip gameOverSound;
+
 	public int wallDmg = 1;
+
+	public Text foodText;
+
 	public int pointsPerFood = 10;
 
 	public int pointsPerSoda = 20;
@@ -19,7 +31,7 @@ public class PlayerMovement : Movement
 	{
 		animator = GetComponent<Animator>();
 		food = Manager.instance.playerFood;
-
+		foodText.text = "Food: " + food;
 		base.Start();
 
 	}
@@ -50,14 +62,16 @@ public class PlayerMovement : Movement
 	protected override void AttemptMove<T>(int xDir, int yDir)
 	{
 		food--;
+		foodText.text = "Food: " + food;
 
 		base.AttemptMove<T>(xDir, yDir);
 
 		RaycastHit2D hit;
-
 		if (Move(xDir, yDir, out hit))
 		{
+			SoundManager.instance.RandomizeSfx(moveSound1, moveSound2);
 		}
+
 
 		CheckIfGameOver();
 
@@ -70,7 +84,7 @@ public class PlayerMovement : Movement
 
 		hitWall.DamageWall(wallDmg);
 
-		animator.SetTrigger("playerChop");
+		animator.SetTrigger("PlayerChop");
 	}
 
 	private void OnTriggerEnter2D(Collider2D other)
@@ -78,35 +92,39 @@ public class PlayerMovement : Movement
 		if (other.tag == "Exit")
 		{
 			Invoke("Restart", restartDelay);
-
+			Manager.instance.playerFood = food;
 			enabled = false;
 		}
 
 		else if (other.tag == "Food")
 		{
+			foodText.text = "Food: " + food + " + " + pointsPerFood;
 			food += pointsPerFood;
+			SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
 
 			other.gameObject.SetActive(false);
 		}
 
 		else if (other.tag == "Soda")
 		{
+			foodText.text = "Food: " + food + " + " + pointsPerSoda;
 			food += pointsPerSoda;
-
+			SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
 			other.gameObject.SetActive(false);
 		}
 	}
 
 	private void Restart()
 	{
-		SceneManager.LoadScene(0);
+		SceneManager.LoadScene("Main");
 	}
 
 	public void LoseFood(int loss)
 	{
-		animator.SetTrigger("playerHit");
-
+		animator.SetTrigger("PlayerHit");
+		foodText.text = "Food: " + food + " - " + loss;
 		food -= loss;
+
 
 		CheckIfGameOver();
 	}
@@ -121,7 +139,8 @@ public class PlayerMovement : Movement
 	{
 		if (food <= 0)
 		{
-
+			SoundManager.instance.PlaySingle(gameOverSound);
+			SoundManager.instance.musicSource.Stop();
 			Manager.instance.GameOver();
 		}
 	}

@@ -3,6 +3,9 @@ using System.Collections;
 
 public class EnemyMovement : Movement
 {
+	public AudioClip enemyAttack1;
+	public AudioClip enemyAttack2;
+	public int hp;
 	public int playerDamage;
 
 	private Animator animator;
@@ -62,7 +65,9 @@ public class EnemyMovement : Movement
 
 		hitPlayer.LoseFood(playerDamage);
 
-		animator.SetTrigger("enemyAttack");
+		SoundManager.instance.RandomizeSfx(enemyAttack1, enemyAttack2);
+
+		animator.SetTrigger("EnemyHit");
 
 	}
 }
