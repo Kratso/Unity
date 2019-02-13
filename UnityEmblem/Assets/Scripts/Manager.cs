@@ -19,7 +19,7 @@ public class Manager : MonoBehaviour
 	private GameObject levelImage;
 	public static Manager instance = null;
 
-	private int level = 1;
+	private int level = 0;
 
 	private List<EnemyMovement> enemies;
 	private bool enemiesMoving;
@@ -48,18 +48,18 @@ public class Manager : MonoBehaviour
 	void InitGame()
 	{
 		doingSetup = true;
-
 		levelImage = GameObject.Find("Level Image");
 		levelText = GameObject.Find("Level Text").GetComponent<Text>();
+		if (level != 0)
+		{
+			levelText.text = "Day: " + level;
 
-		levelText.text = "Day: " + level;
-
-		levelImage.SetActive(true);
-
+			levelImage.SetActive(true);
+			enemies.Clear();
+			boardScript.SetupScene(level);
+		}
 		Invoke("HideLevelImage", levelStartDelay);
 
-		enemies.Clear();
-		boardScript.SetupScene(level);
 	}
 
 	void HideLevelImage()
@@ -79,11 +79,19 @@ public class Manager : MonoBehaviour
 	{
 		levelText.text = "You perished after " + level + "days\nYou won't be remembered.";
 		levelImage.SetActive(true);
-		enabled = false;
-		if (Input.GetKeyDown(KeyCode.Return))
-		{
-			SceneManager.LoadScene("Menu");
-		}
+		playerTurn = false;
+		enemiesMoving = false;
+
+		Invoke("goToMenu", 3f);
+
+	}
+
+	void goToMenu()
+	{
+		Destroy(SoundManager.instance);
+		Destroy(this);
+		SceneManager.LoadScene(0);
+
 	}
 
 
